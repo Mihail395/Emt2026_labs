@@ -1,6 +1,7 @@
 package mk.ukim.finki.emt.emtlab.web;
 
 import mk.ukim.finki.emt.emtlab.model.Accommodation;
+import mk.ukim.finki.emt.emtlab.model.Review;
 import mk.ukim.finki.emt.emtlab.model.dto.AccommodationDto;
 import mk.ukim.finki.emt.emtlab.service.domain.AccommodationService;
 import org.springframework.http.ResponseEntity;
@@ -55,4 +56,27 @@ public class AccommodationController {
         this.accommodationService.markAsRented(id);
         return ResponseEntity.ok().build();
     }
-}
+
+    @PostMapping("/{id}/reviews")
+    public ResponseEntity<Review> addReview(@PathVariable Long id,
+                                            @RequestParam String comment,
+                                            @RequestParam Integer rating) {
+        return ResponseEntity.ok(
+                this.accommodationService.addReview(id, comment, rating)
+        );
+    }
+
+    @GetMapping("/{id}/reviews")
+    public ResponseEntity<List<Review>> getReviews(@PathVariable Long id) {
+        return ResponseEntity.ok(
+                this.accommodationService.getReviewsForAccommodation(id)
+        );
+    }
+
+    @GetMapping("/{id}/average-rating")
+    public ResponseEntity<Double> getAverageRating(@PathVariable Long id){
+        return ResponseEntity.ok(
+                this.accommodationService.getAverageRating(id)
+        );
+    }
+ }

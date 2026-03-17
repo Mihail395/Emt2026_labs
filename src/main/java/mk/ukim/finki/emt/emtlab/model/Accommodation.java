@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import mk.ukim.finki.emt.emtlab.model.enumerations.Category;
 import mk.ukim.finki.emt.emtlab.model.enumerations.Condition;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Accommodation {
@@ -26,6 +28,9 @@ public class Accommodation {
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Review> reviews = new ArrayList<>();
 
     public Accommodation() {}
 

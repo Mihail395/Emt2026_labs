@@ -2,13 +2,14 @@ package mk.ukim.finki.emt.emtlab.service.application;
 
 import mk.ukim.finki.emt.emtlab.model.Accommodation;
 import mk.ukim.finki.emt.emtlab.model.Host;
+import mk.ukim.finki.emt.emtlab.model.Review;
 import mk.ukim.finki.emt.emtlab.model.dto.AccommodationDto;
-import mk.ukim.finki.emt.emtlab.model.enumerations.Category;
 import mk.ukim.finki.emt.emtlab.model.enumerations.Condition;
 import mk.ukim.finki.emt.emtlab.model.exceptions.AccommodationNotFoundException;
 import mk.ukim.finki.emt.emtlab.model.exceptions.HostNotFoundException;
 import mk.ukim.finki.emt.emtlab.repository.AccommodationRepository;
 import mk.ukim.finki.emt.emtlab.repository.HostRepository;
+import mk.ukim.finki.emt.emtlab.repository.ReviewRepository;
 import mk.ukim.finki.emt.emtlab.service.domain.AccommodationService;
 import org.springframework.stereotype.Service;
 
@@ -20,10 +21,12 @@ public class AccommodationServiceImpl implements AccommodationService {
 
     private final AccommodationRepository accommodationRepository;
     private final HostRepository hostRepository;
+    private final ReviewRepository reviewRepository;
 
-    public AccommodationServiceImpl(AccommodationRepository accommodationRepository, HostRepository hostRepository) {
+    public AccommodationServiceImpl(AccommodationRepository accommodationRepository, HostRepository hostRepository, ReviewRepository reviewRepository) {
         this.accommodationRepository = accommodationRepository;
         this.hostRepository = hostRepository;
+        this.reviewRepository = reviewRepository;
     }
 
     @Override
@@ -81,5 +84,31 @@ public class AccommodationServiceImpl implements AccommodationService {
 
         accommodation.setRented(true);
         this.accommodationRepository.save(accommodation);
+    }
+
+    @Override
+    public Review addReview(Long accommodationId, String comment, Integer rating) {
+        Accommodation accommodation = this.accommodationRepository.findById(accommodationId)
+                .orElseThrow(() -> new AccommodationNotFoundException(accommodationId));
+
+        Review review = new Review(comment, rating, accommodation);
+        return reviewRepository.save(review);
+    }
+
+    @Override
+    public List<Review> getReviewsForAccommodation(Long accommodationId) {
+        return reviewRepository.findByAccommodationId(accommodationId);
+    }
+
+    @Override
+    public Double getAverageRating(Long accommodationId) {
+        List<Review> reviews = reviewRepository.findByAccommodationId(accommodationId);
+
+        if (reviews.isEmpty()) return 0.0;
+
+        return reviews.stream()
+                .mapToInt(Review::getRating)
+                .average()
+                .orElse(0.0);
     }
 }
