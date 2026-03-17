@@ -1,2 +1,2 @@
-# Emt2026_labs
-This repo is used for completing the laboratory exercises at FINKI for subject EMT.
+# EMT lab exercises 2026
+Lab1 - API for booking accomodation with some functionalities.
